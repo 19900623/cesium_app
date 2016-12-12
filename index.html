@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>NPMAP3D Demo</title>
+    <style>
+    #viewerContainer {
+        position: absolute;
+        top: 0px;
+        left: 6px;
+        width: 98%;
+        height: 98%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="viewerContainer"></div>
+    <script src="NPMAP3D.js"></script>
+    <script src="map.js"></script>
+    <script type="text/javascript">
+    var height = 11000;
+    var center = new NPMAP3D.Geometry.Point3D(101.42189855473929, 36.668497438001886, height);
+    var map = netMap.createMap(new NPMAP3D.Geometry.Point3D(101.44937454926647, 36.658446073400334, height));
+    netMap.addLayer();
+    netMap.addterrain();
+    var models = {};
+    var timer;
+    var count = 0;
+
+    function loadModel() {
+
+        models["1"] = netMap.createModel({
+            lon: center.lon,
+            lat: center.lat,
+            h: height
+        }, 'model/qinghai.gltf', {
+            id: "1"
+        });
+        models["2"] = netMap.createModel({
+            lon: 96.5078427398,
+            lat: 28.621890026351,
+            h: height
+        }, 'model/qinghai.gltf', {
+            id: "2"
+        });
+        models["3"] = netMap.createModel({
+            lon: 107.5078427398,
+            lat: 23.621890026351,
+            h: height
+        }, 'model/qinghai.gltf', {
+            id: "3"
+        });
+    };
+    loadModel();
+
+
+    function sendProject(id) {
+        var model = models[id];
+        if (model) {
+            netMap.map.setCenter(model._positionLay.position);
+            timer = window.setInterval(function(f) {
+                model.show = !model.show;
+                count++;
+                if (count == 10) {
+                    count = 0;
+                    model.show = true;
+                    window.clearInterval(timer);
+                }
+            }, 500);
+        }
+    }
+    </script>
+</body>
+
+</html>
