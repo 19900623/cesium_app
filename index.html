@@ -21,6 +21,7 @@
     <div id="viewerContainer"></div>
     <script src="NPMAP3D.js"></script>
     <script src="map.js"></script>
+    <script src="jquery.js"></script>
     <script type="text/javascript">
     var height = 11000;
     var center = new NPMAP3D.Geometry.Point3D(101.42189855473929, 36.668497438001886, height);
@@ -31,31 +32,19 @@
     var timer;
     var count = 0;
 
-    function loadModel() {
-
-        models["1"] = netMap.createModel({
-            lon: center.lon,
-            lat: center.lat,
-            h: height
-        }, 'model/qinghai.gltf', {
-            id: "1"
-        });
-        models["2"] = netMap.createModel({
-            lon: 96.5078427398,
-            lat: 28.621890026351,
-            h: height
-        }, 'model/qinghai.gltf', {
-            id: "2"
-        });
-        models["3"] = netMap.createModel({
-            lon: 107.5078427398,
-            lat: 23.621890026351,
-            h: height
-        }, 'model/qinghai.gltf', {
-            id: "3"
-        });
+    function loadModel(fileIds) {
+        if (!fileIds) {
+            return;
+        }
+        var temps = fileIds.split(',')
+        for (var i = temps.length - 1; i >= 0; i--) {
+            var m = temps[i];
+            netMap.requestModel(m,function(model,jsonModel){
+                models[jsonModel.id] = model;
+            });
+        }
     };
-    loadModel();
+    loadModel("_1.json");
 
 
     function sendProject(id) {

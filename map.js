@@ -83,36 +83,69 @@
       * @return {[type]}                   [description]
       */
      createModel: function(position, url, customerAttribute) {
-        var tempPositon = position;
+         var tempPositon = position;
          var position = Cesium.Cartesian3.fromDegrees(position.lon, position.lat, 0);
          var heading = Cesium.Math.toRadians(0);
          var pitch = Cesium.Math.toRadians(0.0);
          var roll = 0.0;
          var orientation = Cesium.Transforms.headingPitchRollQuaternion(position, heading, pitch, roll);
          var scene = this.map.viewer.scene;
-         // var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-         //     Cesium.Cartesian3.fromDegrees(position.lon, position.lat,0));
-         // var model = scene.primitives.add(Cesium.Model.fromGltf({
-         //     url: url, //'model/qinghai.gltf'
-         //     modelMatrix: modelMatrix,
-         //     scale: 1.0
-         // }));
+         var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+             Cesium.Cartesian3.fromDegrees(tempPositon.lon, tempPositon.lat, 0));
+         var model = scene.primitives.add(Cesium.Model.fromGltf({
+             url: url,
+             modelMatrix: modelMatrix,
+             scale: 1.0
+         }));
          // 
+         //primitive._nodeCommands.forEach(function(v,i){nodes.push({name:v.pickCommand._owner.node.name,node:v.pickCommand._owner.node})})
+         // var model = this.map.viewer.entities.add({
+         //     name: url,
+         //     position: position,
+         //     orientation: orientation,
+         //     model: {
+         //         uri: url,
+         //         //minimumPixelSize: 128,
+         //         maximumScale: 2
+         //     }
+         // });
+         if (customerAttribute.nodes) {
+             model.show = false;
+             window.setTimeout(function() {
+                 (function(model) {
+                     var nodes = {};
+                     model._nodeCommands.forEach(function(v, i) {
+                         var parents = v.pickCommand._owner.node._runtimeNode.parents;
+                         for (var i = parents.length - 1; i >= 0; i--) {
+                             if (!nodes[parents[i].publicNode.id]) {
+                                 nodes[parents[i].publicNode.id] = {
+                                     node: parents[i].publicNode,
+                                     children: [v.pickCommand._owner.node]
+                                 };
+                             } else {
+                                 nodes[parents[i].publicNode.id].children.push(v.pickCommand._owner.node);
+                             }
+                             parents[i].publicNode.show = false;
+                         }
 
-         var model = this.map.viewer.entities.add({
-             name: url,
-             position: position,
-             orientation: orientation,
-             model: {
-                 uri: url,
-                 //minimumPixelSize: 128,
-                 maximumScale: 2
-             }
-         });
+                     });
+                     model.nodes = nodes;
+                     for (var i = customerAttribute.nodes.length - 1; i >= 0; i--) {
+                         nodes[customerAttribute.nodes[i]].node.show = true;
+                     }
+                     model.show = true;
+                 })(model)
+             }, 1000);
+         }
 
          customerAttribute.position = tempPositon;
          model._positionLay = customerAttribute;
          return model;
+     },
+     requestModel: function(file, callback) {
+         $.getJSON('data/' + file, function(model) {
+             callback(netMap.createModel(model, model.url, model), model);
+         });
      }
 
  }
