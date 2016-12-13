@@ -3,6 +3,7 @@
     "url": "model/qinghai.gltf",
     "lon": 101.42189855473929,
     "lat": 36.668497438001886,
+    "height": 0,
     "nodes": [
         "node-____________1_.1",
         "node-__________________2_.1",
@@ -14,5 +15,6 @@
         "node-K32_450.9____.1",
         "node-K3188_898.5____.1",
         "node-ZDGL-SBGHSHDQ-YXYF-XBJG-6_"
-    ]
+    ],
+    "scale": 1
 }

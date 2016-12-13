@@ -44,9 +44,9 @@
          var addedImageryLayer = new NPMAP3D.Layer.GoogleLayer(url, 'GOOGLE', {
              minimumLevel: 0,
              maximumLevel: 21,
-             minimumTerrainLevel: 10,
-             //maximumTerrainLevel:21,
-             rectangle: new NPMAP3D.Geometry.Extent(97.6979636816088, 34.16246365697366, 105.98924193032873, 39.55334308624505)
+             // maximumTerrainLevel: 8,
+             // minimumTerrainLevel:0,
+             //rectangle: new NPMAP3D.Geometry.Extent(97.6979636816088, 34.16246365697366, 105.98924193032873, 39.55334308624505)
          });
          this.map.addLayer(addedImageryLayer);
      },
@@ -91,11 +91,11 @@
          var orientation = Cesium.Transforms.headingPitchRollQuaternion(position, heading, pitch, roll);
          var scene = this.map.viewer.scene;
          var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-             Cesium.Cartesian3.fromDegrees(tempPositon.lon, tempPositon.lat, 0));
+             Cesium.Cartesian3.fromDegrees(tempPositon.lon, tempPositon.lat, tempPositon.height || 0));
          var model = scene.primitives.add(Cesium.Model.fromGltf({
              url: url,
              modelMatrix: modelMatrix,
-             scale: 1.0
+             scale: customerAttribute.scale || 1
          }));
          // 
          //primitive._nodeCommands.forEach(function(v,i){nodes.push({name:v.pickCommand._owner.node.name,node:v.pickCommand._owner.node})})
@@ -135,7 +135,7 @@
                      }
                      model.show = true;
                  })(model)
-             }, 1000);
+             }, 1500);
          }
 
          customerAttribute.position = tempPositon;
@@ -146,6 +146,9 @@
          $.getJSON('data/' + file, function(model) {
              callback(netMap.createModel(model, model.url, model), model);
          });
+     },
+     removeModel: function() {
+         this.map.viewer.scene.primitives.removeAll();
      }
 
  }

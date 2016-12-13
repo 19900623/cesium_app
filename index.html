@@ -36,6 +36,7 @@
         if (!fileIds) {
             return;
         }
+        netMap.removeModel();
         var temps = fileIds.split(',')
         for (var i = temps.length - 1; i >= 0; i--) {
             var m = temps[i];
