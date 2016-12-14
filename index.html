@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>NPMAP3D Demo</title>
+    <link rel="stylesheet" type="text/css" href="css/viewer.css">
+    <link rel="stylesheet" type="text/css" href="css/plugins.min.css">
     <style>
     #viewerContainer {
         position: absolute;
@@ -18,7 +20,36 @@
 </head>
 
 <body>
-    <div id="viewerContainer"></div>
+    <div>
+        <div id="viewerContainer"></div>
+        <div class="ButtonDiv">
+            <ul class="navigation buttonGroup no_select">
+                <li class="zoomIn button button-normal" id="zoomIn_button" data-original-title="" title="">
+                    <i class="fa fa-fw fa-plus"></i>
+                </li>
+                <li class="zoomOut button button-normal" id="zoomOut_button" data-original-title="" title="">
+                    <i class="fa fa-fw fa-minus">               
+                </i>
+                </li>
+               <!--  <li class="rotateLeft button button-normal" id="rotateLeft_button" data-original-title="" title="">
+                    <i class="fa fa-fw fa-repeat"></i>
+                </li>
+                <li class="rotateRight button button-normal" id="rotateRight_button" data-original-title="" title="">
+                    <i class="fa fa-fw fa-undo"></i>
+                </li>
+                <li class="rotateUp button button-normal" id="rotateUp_button" data-original-title="" title="">
+                    <i class="fa fa-fw fa-arrows-v"></i>
+                </li> -->
+                <li class="ortho button button-normal" id="ortho_button" data-original-title="">
+                    <i class="fa fa-fw fa-th-large"></i>
+                </li>
+            </ul>
+            <!--  <ul class="util buttonGroup no_select">
+                <li class="share button button-normal" id="share_button" data-original-title="" title=""><i class="fa fa-fw fa-share-alt"></i></li>
+                <li class="lights button button-normal buttonOn" id="lights_button" data-original-title="" title=""><i class="fa fa-fw fa-lightbulb-o"></i></li>
+            </ul> -->
+        </div>
+    </div>
     <script src="NPMAP3D.js"></script>
     <script src="map.js"></script>
     <script src="jquery.js"></script>
@@ -40,7 +71,7 @@
         var temps = fileIds.split(',')
         for (var i = temps.length - 1; i >= 0; i--) {
             var m = temps[i];
-            netMap.requestModel(m,function(model,jsonModel){
+            netMap.requestModel(m, function(model, jsonModel) {
                 models[jsonModel.id] = model;
             });
         }
@@ -53,10 +84,10 @@
         if (model) {
             model._positionLay.position.h = height;
             netMap.map.setCenter(model._positionLay.position);
-            if(timer){
+            if (timer) {
                 window.clearInterval(timer);
                 timer = null;
-            }            
+            }
             timer = window.setInterval(function(f) {
                 model.show = !model.show;
                 count++;

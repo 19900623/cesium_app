@@ -1,5 +1,5 @@
  var netMap = {
-     nodeTree: false,
+     nodeTree: true,
      /**
       * 创建地图
       * @param  {[type]} centerPoint 地图中心点
@@ -9,9 +9,9 @@
          this.centerPoint = centerPoint || new NPMAP3D.Geometry.Point3D(101.8359071295526, 36.530410447258824, 100000);
          this.map = this.viewer = new NPMAP3D.MAP3D('viewerContainer', {
              selectionIndicator: true,
-             homeButton: true
+             homeButton: false
          });
-         this.map.viewer.camera.flyHome = this.gohome;
+         /// this.map.viewer.camera.flyHome = this.gohome;
 
          var scene = this.map.viewer.scene;
          var handler = new Cesium.ScreenSpaceEventHandler(this.map.viewer.scene.canvas);
@@ -26,6 +26,7 @@
 
          }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
          this.gohome();
+         this.registerEvent();
          return this.map;
      },
      /**
@@ -38,10 +39,7 @@
          //     maximumLevel: 21
          // });
          // this.map.addLayer(addedImageryLayer);
-         // 
-
-
-
+         //  
          var addedImageryLayer = new NPMAP3D.Layer.GoogleLayer(url, 'GOOGLE', {
              minimumLevel: 0,
              maximumLevel: 21,
@@ -137,9 +135,9 @@
                      model.nodes = nodes;
                      for (var i = customerAttribute.nodes.length - 1; i >= 0; i--) {
                          if (netMap.nodeTree) {
-                            nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].node.show = true);
+                             nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].node.show = true);
                          } else {
-                            nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].show = true);
+                             nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].show = true);
                          }
                      }
                      model.show = true;
@@ -158,6 +156,61 @@
      },
      removeModel: function() {
          this.map.viewer.scene.primitives.removeAll();
+     },
+     lookAround: function(range) {
+
+     },
+     registerEvent: function() {
+         var button = {
+             "zoomin": "放大",
+             "zoomout": "缩小",
+             "rotate": "旋转",
+             "tilt": "倾斜",
+             "ortho": "鸟瞰",
+             "lightsOff": "关灯",
+             "lights": "开灯",
+             "lightbulb": "全图"
+         };
+
+         this.createClickButton("zoomIn", "fa-plus", button.zoomin);
+         this.createClickButton("zoomOut", "fa-minus", button.zoomout);
+         this.createClickButton("rotateLeft", "fa-repeat", button.rotate);
+         this.createClickButton("rotateRight", "fa-undo", button.rotate);
+         this.createClickButton("rotateUp", "fa-arrows-v", button.tilt);
+         this.createClickButton("ortho", "fa-th-large", button.ortho);
+         this.createClickButton("lights", "lights", button.lightbulb);
+
+
+     },
+     createClickButton: function(button, cssName, title) {
+         $("." + button, $(".ButtonDiv")).attr('title', title).on('mouseenter', function() {
+
+         }).on("mouseleave", function() {
+
+         }).click(function() {
+             switch (button) {
+                 case "zoomIn":
+                     netMap.map.viewer.camera.zoomIn();
+                     break;
+                 case "zoomOut":
+                     netMap.map.viewer.camera.zoomOut();
+                     break;
+                 case "rotateLeft":
+                     break;
+                 case "rotateRight":
+                     break;
+                 case "rotateUp":
+                     break;
+                 case "ortho":
+                     netMap.gohome();
+                     break;
+                 case "lights":
+                     netMap.map.viewer.camera.flyHome();
+                     break;
+                 default:
+                     break;
+             }
+         });
      }
 
  }
