@@ -1,4 +1,5 @@
  var netMap = {
+     nodeTree: false,
      /**
       * 创建地图
       * @param  {[type]} centerPoint 地图中心点
@@ -115,23 +116,31 @@
                  (function(model) {
                      var nodes = {};
                      model._nodeCommands.forEach(function(v, i) {
-                         var parents = v.pickCommand._owner.node._runtimeNode.parents;
-                         for (var i = parents.length - 1; i >= 0; i--) {
-                             if (!nodes[parents[i].publicNode.id]) {
-                                 nodes[parents[i].publicNode.id] = {
-                                     node: parents[i].publicNode,
-                                     children: [v.pickCommand._owner.node]
-                                 };
-                             } else {
-                                 nodes[parents[i].publicNode.id].children.push(v.pickCommand._owner.node);
+                         if (netMap.nodeTree) {
+                             var parents = v.pickCommand._owner.node._runtimeNode.parents;
+                             for (var i = parents.length - 1; i >= 0; i--) {
+                                 if (!nodes[parents[i].publicNode.id]) {
+                                     nodes[parents[i].publicNode.id] = {
+                                         node: parents[i].publicNode,
+                                         children: [v.pickCommand._owner.node]
+                                     };
+                                 } else {
+                                     nodes[parents[i].publicNode.id].children.push(v.pickCommand._owner.node);
+                                 }
+                                 parents[i].publicNode.show = false;
                              }
-                             parents[i].publicNode.show = false;
+                         } else {
+                             nodes[v.pickCommand._owner.node.id] = v.pickCommand._owner.node;
+                             v.pickCommand._owner.node.show = false;
                          }
-
                      });
                      model.nodes = nodes;
                      for (var i = customerAttribute.nodes.length - 1; i >= 0; i--) {
-                         nodes[customerAttribute.nodes[i]].node.show = true;
+                         if (netMap.nodeTree) {
+                            nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].node.show = true);
+                         } else {
+                            nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].show = true);
+                         }
                      }
                      model.show = true;
                  })(model)

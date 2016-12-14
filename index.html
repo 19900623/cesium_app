@@ -45,13 +45,18 @@
             });
         }
     };
-    loadModel("_1.json");
+    //loadModel("_1.json");
 
 
     function sendProject(id) {
         var model = models[id];
         if (model) {
+            model._positionLay.position.h = height;
             netMap.map.setCenter(model._positionLay.position);
+            if(timer){
+                window.clearInterval(timer);
+                timer = null;
+            }            
             timer = window.setInterval(function(f) {
                 model.show = !model.show;
                 count++;
@@ -59,6 +64,7 @@
                     count = 0;
                     model.show = true;
                     window.clearInterval(timer);
+                    timer = null;
                 }
             }, 500);
         }
