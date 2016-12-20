@@ -15,16 +15,39 @@
 
          var scene = this.map.viewer.scene;
          var handler = new Cesium.ScreenSpaceEventHandler(this.map.viewer.scene.canvas);
-         handler.setInputAction(function(position) {
-             var selected = scene.pick(position.position);
-             if (selected) {
-                 window.selected = selected;
-                 if (typeof(activeProject) != "undefined") {
-                     activeProject(selected.id._positionLay.id || selected.primitive._positionLay.id);
+         var page = this.getQueryString('page') || "1";
+         if (page === "1") {
+             // 双击显示模型的ID
+             handler.setInputAction(function(position) {
+                 var selected = scene.pick(position.position);
+                 if (selected) {
+                     window.selected = selected;
+                     var id = (selected.id && selected.id._positionLay.id) || (selected.primitive._positionLay.id);
+                     console.log(id);
+                     if (typeof(activeProject) != "undefined") {
+                         activeProject(id);
+                     }
                  }
-             }
+                 return false;
 
-         }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+             }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+         } else if (page === '2') {
+             // 单击显示某标段的ID
+             handler.setInputAction(function(position) {
+                 var selected = scene.pick(position.position);
+                 if (selected) {
+                     console.log(selected.node.id);
+                     window.selected = selected;
+                     if (typeof(clickProject) != "undefined") {
+                         clickProject(selected.node.id);
+                     }
+                 } else {
+                     typeof(clickProject) != "undefined" && clickProject(null);
+                 }
+                 return false;
+
+             }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+         }
          this.gohome();
          this.registerEvent();
          return this.map;
@@ -108,31 +131,32 @@
          //         maximumScale: 2
          //     }
          // });
-         if (customerAttribute.nodes) {
-             model.show = false;
-             window.setTimeout(function() {
-                 (function(model) {
-                     var nodes = {};
-                     model._nodeCommands.forEach(function(v, i) {
-                         if (netMap.nodeTree) {
-                             var parents = v.pickCommand._owner.node._runtimeNode.parents;
-                             for (var i = parents.length - 1; i >= 0; i--) {
-                                 if (!nodes[parents[i].publicNode.id]) {
-                                     nodes[parents[i].publicNode.id] = {
-                                         node: parents[i].publicNode,
-                                         children: [v.pickCommand._owner.node]
-                                     };
-                                 } else {
-                                     nodes[parents[i].publicNode.id].children.push(v.pickCommand._owner.node);
-                                 }
-                                 parents[i].publicNode.show = false;
+         // if (customerAttribute.nodes) {
+         model.show = false;
+         window.setTimeout(function() {
+             (function(model) {
+                 var nodes = {};
+                 model._nodeCommands.forEach(function(v, i) {
+                     if (netMap.nodeTree) {
+                         var parents = v.pickCommand._owner.node._runtimeNode.parents;
+                         for (var i = parents.length - 1; i >= 0; i--) {
+                             if (!nodes[parents[i].publicNode.id]) {
+                                 nodes[parents[i].publicNode.id] = {
+                                     node: parents[i].publicNode,
+                                     children: [v.pickCommand._owner.node]
+                                 };
+                             } else {
+                                 nodes[parents[i].publicNode.id].children.push(v.pickCommand._owner.node);
                              }
-                         } else {
-                             nodes[v.pickCommand._owner.node.id] = v.pickCommand._owner.node;
-                             v.pickCommand._owner.node.show = false;
+                             parents[i].publicNode.show = customerAttribute.nodes ? false : true;
                          }
-                     });
-                     model.nodes = nodes;
+                     } else {
+                         nodes[v.pickCommand._owner.node.id] = v.pickCommand._owner.node;
+                         v.pickCommand._owner.node.show = customerAttribute.nodes ? false : true;
+                     }
+                 });
+                 model.nodes = nodes;
+                 if (customerAttribute.nodes) {
                      for (var i = customerAttribute.nodes.length - 1; i >= 0; i--) {
                          if (netMap.nodeTree) {
                              nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].node.show = true);
@@ -140,17 +164,18 @@
                              nodes[customerAttribute.nodes[i]] && (nodes[customerAttribute.nodes[i]].show = true);
                          }
                      }
-                     model.show = true;
-                 })(model)
-             }, 1500);
-         }
+                 }
+                 model.show = true;
+             })(model)
+         }, 1500);
+         //}
 
          customerAttribute.position = tempPositon;
          model._positionLay = customerAttribute;
          return model;
      },
      requestModel: function(file, callback) {
-         $.getJSON('data/' + file, function(model) {
+         $.getJSON('data/' + file + "?v=" + new Date().getTime(), function(model) {
              callback(netMap.createModel(model, model.url, model), model);
          });
      },
@@ -211,6 +236,12 @@
                      break;
              }
          });
+     },
+     getQueryString: function(name) {
+         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+         var r = window.location.search.substr(1).match(reg);
+         if (r != null) return unescape(r[2]);
+         return null;
      }
 
  }
