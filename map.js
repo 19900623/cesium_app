@@ -133,6 +133,7 @@
          // });
          // if (customerAttribute.nodes) {
          model.show = false;
+         //customerAttribute.nodes 为null 则全部显示，为[] 则表示，只显示数组中的，其他不显示
          window.setTimeout(function() {
              (function(model) {
                  var nodes = {};
