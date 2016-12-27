@@ -31,7 +31,7 @@
                     <i class="fa fa-fw fa-minus">               
                 </i>
                 </li>
-               <!--  <li class="rotateLeft button button-normal" id="rotateLeft_button" data-original-title="" title="">
+                <!--  <li class="rotateLeft button button-normal" id="rotateLeft_button" data-original-title="" title="">
                     <i class="fa fa-fw fa-repeat"></i>
                 </li>
                 <li class="rotateRight button button-normal" id="rotateRight_button" data-original-title="" title="">
@@ -53,15 +53,38 @@
     <script src="NPMAP3D.js"></script>
     <script src="map.js"></script>
     <script src="jquery.js"></script>
+    <script src="GeoserverTerrainProvider.js"></script>
     <script type="text/javascript">
     var height = 11000;
-    var center = new NPMAP3D.Geometry.Point3D(101.42189855473929, 36.668497438001886, height);
-    var map = netMap.createMap(new NPMAP3D.Geometry.Point3D(101.44937454926647, 36.658446073400334, height));
+
+    var center = new NPMAP3D.Geometry.Point3D( 101.434346,  36.659984, height);
+    var map = netMap.createMap(new NPMAP3D.Geometry.Point3D(101.41333753988016,36.66522630145481, 6000));
     netMap.addLayer();
     netMap.addterrain();
+    var model = netMap.loadTest();
+    //var model = netMap.loadKmz();
+    netMap.addMarkers();
     var models = {};
     var timer;
     var count = 0;
+    // var terrainProvider = new Cesium.GeoserverTerrainProvider({
+    //     heightMapWidth: 65,
+    //     heightMapHeight: 65,
+    //     url: '/geoserver/terrain/wms', //geoserver与Cesium不同域，要记得做代理 
+    //     layerName: 'srtm_56_05',
+    //     //url: 'http://localhost/geoserver/gwc/service/wms',
+    //     //layerName: 'terrain:SZ_ASTGTM2',//如果自己爬了瓦片就用这个
+    //     maxLevel: 13,
+    //     formatImage: {
+    //         format: "image/png",
+    //         extension: "png"
+    //     },
+    //     styleName: 'grayToColor',
+    //     hasStyledImage: true,
+    //     waterMask: false
+    // });
+
+    // netMap.map.viewer.scene.terrainProvider = terrainProvider;
 
     function loadModel(fileIds) {
         if (!fileIds) {
